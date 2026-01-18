@@ -1,0 +1,158 @@
+{
+  "nbformat": 4,
+  "nbformat_minor": 0,
+  "metadata": {
+    "colab": {
+      "provenance": [],
+      "authorship_tag": "ABX9TyPwweOKK83x7pbHCje6gzXG",
+      "include_colab_link": true
+    },
+    "kernelspec": {
+      "name": "python3",
+      "display_name": "Python 3"
+    },
+    "language_info": {
+      "name": "python"
+    }
+  },
+  "cells": [
+    {
+      "cell_type": "markdown",
+      "metadata": {
+        "id": "view-in-github",
+        "colab_type": "text"
+      },
+      "source": [
+        "<a href=\"https://colab.research.google.com/github/TheNotFire/l/blob/main/test\" target=\"_parent\"><img src=\"https://colab.research.google.com/assets/colab-badge.svg\" alt=\"Open In Colab\"/></a>"
+      ]
+    },
+    {
+      "cell_type": "code",
+      "execution_count": null,
+      "metadata": {
+        "colab": {
+          "base_uri": "https://localhost:8080/",
+          "height": 106
+        },
+        "cellView": "form",
+        "id": "h2eiSYKa7aXj",
+        "outputId": "32e777de-548c-468d-febc-4337880c78e4"
+      },
+      "outputs": [
+        {
+          "output_type": "error",
+          "ename": "SyntaxError",
+          "evalue": "unterminated string literal (detected at line 103) (ipython-input-394959095.py, line 103)",
+          "traceback": [
+            "\u001b[0;36m  File \u001b[0;32m\"/tmp/ipython-input-394959095.py\"\u001b[0;36m, line \u001b[0;32m103\u001b[0m\n\u001b[0;31m    \"https://github\u001b[0m\n\u001b[0m    ^\u001b[0m\n\u001b[0;31mSyntaxError\u001b[0m\u001b[0;31m:\u001b[0m unterminated string literal (detected at line 103)\n"
+          ]
+        }
+      ],
+      "source": [
+        "# @title 🚀 Install SD WebUI Forge (Neo)\n",
+        "# @markdown ### 1. System Check & Setup\n",
+        "import os, sys, subprocess\n",
+        "\n",
+        "# ---------------------------------------------------------------------------- #\n",
+        "# GPU & Python Environment Check\n",
+        "# ---------------------------------------------------------------------------- #\n",
+        "import torch\n",
+        "if not torch.cuda.is_available():\n",
+        "    print(\"🚨 ERROR: No GPU detected! 🚨\")\n",
+        "    print(\"Please go to 'Runtime > Change runtime type' and select 'T4 GPU' (or A100).\")\n",
+        "    raise RuntimeError(\"No GPU detected. Installation stopped.\")\n",
+        "\n",
+        "python_version = f\"python{sys.version_info.major}.{sys.version_info.minor}\"\n",
+        "print(f\"✅ GPU Detected: {torch.cuda.get_device_name(0)}\")\n",
+        "print(f\"🐍 Python Version: {python_version}\")\n",
+        "\n",
+        "# Define Paths\n",
+        "root_dir = \"/content\"\n",
+        "repo_dir = os.path.join(root_dir, \"stable-diffusion-webui-forge\")\n",
+        "models_dir = os.path.join(repo_dir, \"models\", \"Stable-diffusion\")\n",
+        "lora_dir = os.path.join(repo_dir, \"models\", \"Lora\")\n",
+        "vae_dir = os.path.join(repo_dir, \"models\", \"VAE\")\n",
+        "embeddings_dir = os.path.join(repo_dir, \"embeddings\")\n",
+        "extensions_dir = os.path.join(repo_dir, \"extensions\")\n",
+        "adetailer_dir = os.path.join(repo_dir, \"models\", \"adetailer\")\n",
+        "esrgan_dir = os.path.join(repo_dir, \"models\", \"ESRGAN\")\n",
+        "\n",
+        "# Options\n",
+        "Update_Repo = True # @param {type:\"boolean\"}\n",
+        "Clear_Log = True # @param {type:\"boolean\"}\n",
+        "\n",
+        "# @markdown **User-Defined Arguments:**\n",
+        "# @markdown (Updated for Neo: Uses `--vae-in-fp32` instead of `--no-half-vae`)\n",
+        "additional_arguments = \"--theme dark --vae-in-fp32 --attention-pytorch\" # @param {type:\"string\"}\n",
+        "\n",
+        "# @markdown ---\n",
+        "# @markdown ### 2. Model Selection\n",
+        "Animagine_XL_3_1 = False # @param {type:\"boolean\"}\n",
+        "Rae_Diffusion_XL_v2 = False # @param {type:\"boolean\"}\n",
+        "Kivotos_XL_2_0 = False # @param {type:\"boolean\"}\n",
+        "UrangDiffusion_2_0 = False # @param {type:\"boolean\"}\n",
+        "WAI_NSFW_Illustrious = False # @param {type:\"boolean\"}\n",
+        "Illustrious_XL_SmoothFT = False # @param {type:\"boolean\"}\n",
+        "Madly_Mix_Nightnoob = False # @param {type:\"boolean\"}\n",
+        "Hassaku_XL_Illustrious = False # @param {type:\"boolean\"}\n",
+        "Flux_1_Dev_BnB_nf4 = False # @param {type:\"boolean\"}\n",
+        "\n",
+        "# Model URLs\n",
+        "model_map = {\n",
+        "    \"Animagine_XL_3_1\": \"https://huggingface.co/cagliostrolab/animagine-xl-3.1/resolve/main/animagine-xl-3.1.safetensors\",\n",
+        "    \"Rae_Diffusion_XL_v2\": \"https://huggingface.co/Raelina/Rae-Diffusion-XL-V2/resolve/main/RaeDiffusion-XL-v2.safetensors\",\n",
+        "    \"Kivotos_XL_2_0\": \"https://huggingface.co/yodayo-ai/kivotos-xl-2.0/resolve/main/kivotos-xl-2.0.safetensors\",\n",
+        "    \"UrangDiffusion_2_0\": \"https://huggingface.co/kayfahaarukku/UrangDiffusion-2.0/resolve/main/UrangDiffusion-2.0.safetensors\",\n",
+        "    \"WAI_NSFW_Illustrious\": \"https://civitai.com/api/download/models/1490781?type=Model&format=SafeTensor&size=pruned&fp=fp16\",\n",
+        "    \"Illustrious_XL_SmoothFT\": \"https://civitai.com/api/download/models/1015877?type=Model&format=SafeTensor&size=pruned&fp=fp16\",\n",
+        "    \"Madly_Mix_Nightnoob\": \"https://civitai.com/api/download/models/1202045?type=Model&format=SafeTensor&size=full&fp=fp16\",\n",
+        "    \"Hassaku_XL_Illustrious\": \"https://civitai.com/api/download/models/1240288?type=Model&format=SafeTensor&size=pruned&fp=bf16\",\n",
+        "    \"Flux_1_Dev_BnB_nf4\": \"https://huggingface.co/lllyasviel/flux1-dev-bnb-nf4/resolve/main/flux1-dev-bnb-nf4-v2.safetensors\"\n",
+        "}\n",
+        "\n",
+        "# @markdown **Custom Model URL** (Downloads by default):\n",
+        "custom_model_url = \"https://civitai.com/api/download/models/2514310?type=Model&format=SafeTensor&size=pruned&fp=fp16\" # @param {type:\"string\"}\n",
+        "\n",
+        "# @markdown ---\n",
+        "# @markdown ### 3. LoRA & Tools\n",
+        "Schnell_Lora_For_Flux1Dev = False # @param {type:\"boolean\"}\n",
+        "custom_lora_url = \"https://civitai.com/api/download/models/1157361?type=Model&format=SafeTensor, https://civitai.com/api/download/models/1375651?type=Model&format=SafeTensor, https://civitai.com/api/download/models/2432252?type=Model&format=SafeTensor, https://civitai.com/api/download/models/2530261?type=Model&format=SafeTensor, https://civitai.com/api/download/models/1552087?type=Model&format=SafeTensor, https://civitai.com/api/download/models/1607510?type=Model&format=SafeTensor, https://civitai.com/api/download/models/1352742?type=Model&format=SafeTensor, https://civitai.com/api/download/models/1356500?type=Model&format=SafeTensor, https://civitai.com/api/download/models/2044945?type=Model&format=SafeTensor, https://civitai.com/api/download/models/2553920?type=Model&format=SafeTensor, https://civitai.com/api/download/models/895984?type=Model&format=SafeTensor, https://civitai.com/api/download/models/1163208?type=Model&format=SafeTensor, https://civitai.com/api/download/models/1253039?type=Model&format=SafeTensor, https://civitai.com/api/download/models/2536829?type=Model&format=SafeTensor, https://civitai.com/api/download/models/1796188?type=Model&format=SafeTensor, https://civitai.com/api/download/models/2526203?type=Model&format=SafeTensor\" # @param {type:\"string\"}\n",
+        "custom_adetailer_url = \"https://civitai.com/api/download/models/2350456?type=Archive&format=Other\" # @param {type:\"string\"}\n",
+        "\n",
+        "\n",
+        "# ---------------------------------------------------------------------------- #\n",
+        "# Helper Functions\n",
+        "# ---------------------------------------------------------------------------- #\n",
+        "def install_dependencies():\n",
+        "    print(\"📦 Installing Utilities...\")\n",
+        "    !apt-get -y install -qq aria2 lz4\n",
+        "    !pip install -q git+https://github.com/Linaqruf/colablib\n",
+        "\n",
+        "    # Handle Fast-Repo Deps\n",
+        "    # NOTE: We only install this on Python 3.10.\n",
+        "    # Python 3.12 (New Colab) is incompatible with these pre-compiled binaries.\n",
+        "    if \"python3.10\" in python_version:\n",
+        "        print(\"⚡ Python 3.10 Detected. Installing Fast-Repo Dependencies...\")\n",
+        "        !aria2c --console-log-level=error -c -x 16 -s 16 -k 1M https://huggingface.co/Linaqruf/fast-repo/resolve/main/webui-forge-deps.tar.lz4 -o deps.tar.lz4\n",
+        "        !tar -xI lz4 -f deps.tar.lz4 --directory /usr/local/lib/python3.10/dist-packages/\n",
+        "        !rm deps.tar.lz4\n",
+        "    else:\n",
+        "        print(f\"⚠️ {python_version} detected. Skipping Fast-Repo (it is for 3.10). Forge will self-install dependencies.\")\n",
+        "\n",
+        "def clone_repo():\n",
+        "    if not os.path.exists(repo_dir):\n",
+        "        print(\"📂 Cloning WebUI Forge (Neo)...\")\n",
+        "        !git clone -b neo https://github.com/Haoming02/sd-webui-forge-classic {repo_dir}\n",
+        "    elif Update_Repo:\n",
+        "        print(\"🔄 Updating Repo...\")\n",
+        "        !git -C {repo_dir} pull\n",
+        "\n",
+        "def install_extensions():\n",
+        "    print(\"🧩 Installing Extensions...\")\n",
+        "    extensions = [\n",
+        "        \"https://github.com/Anzhc/aadetailer-reforge.git\",\n",
+        "        \"https://github"
+      ]
+    }
+  ]
+}
